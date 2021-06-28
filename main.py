@@ -1,21 +1,36 @@
 from pdf2image import convert_from_path
 import cv2
 import os
+from threading import Thread
+from configparser import ConfigParser
 
-pdf_labels = [a for a in os.listdir() if a.endswith(".pdf")]
+parser = ConfigParser()
+parser.read('config.ini')
 
-pdf_labels.sort()
+irfan_path = parser.get('path_to_irfan', 'path')
 
-for label_number, label_name in enumerate(pdf_labels):
-    pages = convert_from_path(label_name, 500)
+
+def main(l_number, l_name):
+    pages = convert_from_path(l_name, 500)
 
     # Saving pages in jpeg format
 
     for page in pages:
-        page.save(f'label_{label_number}.jpg', 'JPEG')
+        page.save(f'label_{l_number}.jpg', 'JPEG')
 
-    img = cv2.imread(f'label_{label_number}.jpg')
+    img = cv2.imread(f'label_{l_number}.jpg')
     crop_img = img[2676:4719, 243:3155]
     rotated_img = cv2.rotate(crop_img, rotateCode=cv2.ROTATE_90_CLOCKWISE)
-    cv2.imwrite(f'label_{label_number}.jpg', rotated_img)
-    os.system(f'i_view64 {f"label_{label_number}.jpg"} /print')
+    cv2.imwrite(f'label_{l_number}.jpg', rotated_img)
+
+    # Instantiate Irfan View to print the label
+    os.system(
+        f'{irfan_path} {f"label_{l_number}.jpg"} /print')
+
+
+if __name__ == '__main__':
+    pdf_labels = [a for a in os.listdir() if a.endswith(".pdf")]
+    pdf_labels.sort()
+
+    for label_number, label_name in enumerate(pdf_labels):
+        Thread(target=main, args=(label_number, label_name)).start()
