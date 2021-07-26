@@ -33,4 +33,5 @@ if __name__ == '__main__':
     pdf_labels.sort()
 
     for label_number, label_name in enumerate(pdf_labels):
-        Thread(target=main, args=(label_number, label_name)).start()
+        # Thread(target=main, args=(label_number, label_name)).start()
+        main(label_number, label_name)
