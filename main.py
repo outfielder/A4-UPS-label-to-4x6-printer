@@ -1,7 +1,7 @@
 from pdf2image import convert_from_path
 import cv2
 import os
-from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
 
 parser = ConfigParser()
@@ -31,7 +31,8 @@ def main(l_number, l_name):
 if __name__ == '__main__':
     pdf_labels = [a for a in os.listdir() if a.endswith(".pdf")]
     pdf_labels.sort()
-
-    for label_number, label_name in enumerate(pdf_labels):
-        # Thread(target=main, args=(label_number, label_name)).start()
-        main(label_number, label_name)
+    with ThreadPoolExecutor() as executor:
+        for label_number, label_name in enumerate(pdf_labels):
+            # Thread(target=main, args=(label_number, label_name)).start()
+            # main(label_number, label_name)
+            executor.submit(main, label_number, label_name)
