@@ -1,13 +1,20 @@
-from pdf2image import convert_from_path
-import cv2
+import logging
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from configparser import ConfigParser
+
+import cv2
+from pdf2image import convert_from_path
 
 parser = ConfigParser()
 parser.read('config.ini')
 
 irfan_path = parser.get('path_to_irfan', 'path')
+if irfan_path == 'ADD YOUR OWN PATH TO IRFAN VIEWER':
+    logging.error('Please add a PATH to the Irfan Viewer executable in your '
+                  'config.ini file.')
+    sys.exit()
 
 
 def main(l_number, l_name):
